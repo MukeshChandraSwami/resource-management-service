@@ -1,7 +1,6 @@
 package com.learn.resource_management_service.responses.internal;
 
-
-import com.learn.resource_management_service.models.ImageAnalysis;
+import com.learn.resource_management_service.models.SearchResult;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -9,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.UUID;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,11 +16,10 @@ import java.util.UUID;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class MediaResponse {
+public class SearchResponse {
 
     private boolean success;
     private String responseMsg;
     private int responseCode;
-    private UUID id;
-    private ImageAnalysis imageAnalysis;
+    private List<SearchResult> searchResponses;
 }

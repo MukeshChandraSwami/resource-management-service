@@ -1,6 +1,7 @@
 package com.learn.resource_management_service.services;
 
 import com.learn.resource_management_service.models.ImageAnalysis;
+import com.learn.resource_management_service.responses.internal.MediaResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -41,7 +42,12 @@ public class MediaDetailsExtractorService {
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            return restTemplate.postForObject(MEDIA, requestEntity, ImageAnalysis.class);
+            MediaResponse mediaResponse = restTemplate.postForObject(MEDIA, requestEntity, MediaResponse.class);
+            if (mediaResponse.isSuccess()) {
+                return mediaResponse.getImageAnalysis();
+            } else {
+                return new ImageAnalysis();
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error while media details extraction.", e);
         }

@@ -1,72 +1,73 @@
 package com.learn.resource_management_service.utils;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Map;
+import com.learn.resource_management_service.models.ImageAnalysis;
 
 public class EmbeddingUtils {
 
-    public static String toEmbeddingInput(Object obj) {
-        StringBuilder sb = new StringBuilder();
-        serializeObject(obj, sb, "");
-        return sb.toString().trim();
+    public static String toEmbeddingInput(ImageAnalysis imageAnalysis) {
+        return toText(imageAnalysis);
     }
 
-    private static void serializeObject(Object obj, StringBuilder sb, String prefix) {
-        if (obj == null) {
-            return;
+    public static String toText(ImageAnalysis analysis) {
+        StringBuilder sb = new StringBuilder();
+
+        if (analysis.getMainContent() != null) {
+            sb.append("Main content: ").append(analysis.getMainContent()).append(". ");
         }
 
-        Class<?> clazz = obj.getClass();
-
-        // If primitive, wrapper, or string → append directly
-        if (clazz.isPrimitive() || obj instanceof String || obj instanceof Number || obj instanceof Boolean) {
-            sb.append(prefix).append(obj.toString()).append(". ");
-            return;
-        }
-
-        // If it's a collection
-        if (obj instanceof Collection<?>) {
-            Collection<?> collection = (Collection<?>) obj;
-            for (Object item : collection) {
-                serializeObject(item, sb, prefix);
-            }
-            return;
-        }
-
-        // If it's a map
-        if (obj instanceof Map<?, ?>) {
-            Map<?, ?> map = (Map<?, ?>) obj;
-            for (Map.Entry<?, ?> entry : map.entrySet()) {
-                sb.append(prefix).append(entry.getKey()).append(": ");
-                serializeObject(entry.getValue(), sb, prefix + entry.getKey() + " ");
-            }
-            return;
-        }
-
-        // If it's an array
-        if (clazz.isArray()) {
-            int length = java.lang.reflect.Array.getLength(obj);
-            for (int i = 0; i < length; i++) {
-                serializeObject(java.lang.reflect.Array.get(obj, i), sb, prefix);
-            }
-            return;
-        }
-
-        // Otherwise, assume it's a custom object → reflect fields
-        for (Field field : clazz.getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                Object value = field.get(obj);
-                if (value != null) {
-                    String fieldName = field.getName();
-                    sb.append(prefix).append(fieldName).append(": ");
-                    serializeObject(value, sb, prefix + fieldName + " ");
-                    sb.append("\n");
-                }
-            } catch (IllegalAccessException e) {
-                // ignore inaccessible fields
+        if (analysis.getObjects() != null && !analysis.getObjects().isEmpty()) {
+            sb.append("Objects: ");
+            for (ImageAnalysis.ObjectItem obj : analysis.getObjects()) {
+                sb.append(String.format("%s (quantity: %d, position: %s, description: %s). ",
+                        obj.getName(),
+                        obj.getQuantity(),
+                        obj.getPosition(),
+                        obj.getDescription()));
             }
         }
+
+        if (analysis.getText() != null && !analysis.getText().isEmpty()) {
+            sb.append("Text found: ");
+            for (ImageAnalysis.TextItem txt : analysis.getText()) {
+                sb.append(String.format("\"%s\" at %s. ", txt.getContent(), txt.getPosition()));
+            }
+        }
+
+        if (analysis.getBackground() != null) {
+            sb.append("Background: ")
+                    .append(analysis.getBackground().getEnvironment()).append(", ")
+                    .append(analysis.getBackground().getDetails()).append(". ");
+        }
+
+        if (analysis.getColorsAndTextures() != null) {
+            sb.append("Colors: ")
+                    .append(String.join(", ", analysis.getColorsAndTextures().getDominantColors()))
+                    .append(". Textures: ")
+                    .append(String.join(", ", analysis.getColorsAndTextures().getTextures()))
+                    .append(". ");
+        }
+
+        if (analysis.getScene() != null) {
+            sb.append("Scene type: ").append(analysis.getScene().getType())
+                    .append(", activity: ").append(analysis.getScene().getActivity()).append(". ");
+        }
+
+        if (analysis.getStyle() != null) {
+            sb.append("Style: ").append(analysis.getStyle().getImageType())
+                    .append(", mood: ").append(analysis.getStyle().getMoodOrTone()).append(". ");
+        }
+
+        if (analysis.getMetadata() != null) {
+            sb.append("Metadata: ")
+                    .append("Resource Type: ").append(analysis.getMetadata().getResourceType()).append(", ")
+                    .append("Resource Id: ").append(analysis.getMetadata().getResourceId()).append(", ")
+                    .append("Account Mapping Id: ").append(analysis.getMetadata().getAccountMappingId()).append(". ");
+        }
+
+        if (analysis.getTags() != null && !analysis.getTags().isEmpty()) {
+            sb.append("Tags: ").append(String.join(", ", analysis.getTags())).append(". ");
+        }
+
+        return sb.toString().trim();
     }
 }

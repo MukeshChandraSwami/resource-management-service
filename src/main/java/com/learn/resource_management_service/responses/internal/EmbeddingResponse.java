@@ -1,7 +1,7 @@
 package com.learn.resource_management_service.responses.internal;
 
 
-import com.learn.resource_management_service.models.ImageAnalysis;
+import com.learn.resource_management_service.constants.ResourceTypes;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,11 +17,13 @@ import java.util.UUID;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class MediaResponse {
+public class EmbeddingResponse {
 
     private boolean success;
     private String responseMsg;
     private int responseCode;
     private UUID id;
-    private ImageAnalysis imageAnalysis;
+    private UUID resourceId;
+    private String content;
+    private ResourceTypes resourceType;
 }
